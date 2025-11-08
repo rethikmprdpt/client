@@ -5,3 +5,7 @@ export const getTechnicians = () => {
     params: { role: "Technician" },
   });
 };
+
+export const getAllUsers = () => {
+  return apiClient.get("/users/all");
+};
