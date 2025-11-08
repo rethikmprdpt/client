@@ -1,5 +1,6 @@
 import { useFrame, Canvas } from "@react-three/fiber";
-import { LogIn, Info } from "lucide-react";
+// Import the LogOut icon
+import { LogIn, Info, LogOut } from "lucide-react";
 import { useRef } from "react";
 
 function RotatingLogo() {
@@ -20,9 +21,10 @@ function RotatingLogo() {
   );
 }
 
-export default function Header() {
+// 1. Accept `user` and `onLogout` as props
+export default function Header({ user, onLogout }) {
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -43,10 +45,30 @@ export default function Header() {
               <Info size={18} />
               <span className="hidden md:inline">About</span>
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <LogIn size={18} />
-              <span className="hidden md:inline">Sign In</span>
-            </button>
+
+            {/* 2. Add conditional logic */}
+            {user ? (
+              // User is LOGGED IN
+              <>
+                <span className="text-gray-700 text-sm hidden lg:inline">
+                  Welcome,{" "}
+                  <span className="font-semibold">{user.username}</span>
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  <LogOut size={18} />
+                  <span className="hidden md:inline">Log Out</span>
+                </button>
+              </>
+            ) : (
+              // User is LOGGED OUT
+              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <LogIn size={18} />
+                <span className="hidden md:inline">Sign In</span>
+              </button>
+            )}
           </nav>
         </div>
       </div>

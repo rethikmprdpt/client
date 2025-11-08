@@ -82,7 +82,7 @@ export default function AssetEditForm({ asset, onSave, onCancel }) {
           value={formData.location}
           onChange={handleChange}
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., Customer:1, Warehouse:1"
+          placeholder="e.g., Customer:1"
         />
       </div>
 
