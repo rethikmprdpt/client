@@ -8,6 +8,7 @@ import {
   ListTodo,
   LifeBuoy,
   ShieldCheck,
+  User,
 } from "lucide-react";
 
 // 1. Define all possible navigation links with their roles
@@ -40,6 +41,12 @@ export const allLinks = [
     name: "Audit",
     to: "/audit", // You will need to create this page
     icon: ShieldCheck,
+    roles: ["Admin"],
+  },
+  {
+    name: "Users",
+    to: "/users", // You will need to create this page
+    icon: User,
     roles: ["Admin"],
   },
 ];

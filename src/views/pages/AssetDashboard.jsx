@@ -1,6 +1,6 @@
 // import { useState, useEffect } from "react";
-// import StatsSummary from "../components/asset-dashboard/StatsSummary";
-// import AssetRow from "../components/asset-dashboard/AssetRow";
+// import StatsSummary from "../../components/asset-dashboard/StatsSummary";
+// import AssetRow from "../../components/asset-dashboard/AssetRow";
 // import {
 //   ChevronDown,
 //   ChevronRight,
@@ -9,12 +9,12 @@
 //   Plus,
 //   GitBranch,
 // } from "lucide-react";
-// import * as AssetAPI from "../api/assetApi";
-// import AddAssetModal from "../components/asset-dashboard/AddAssetModal";
-// import ConfirmationModal from "../components/asset-dashboard/ConfirmationModal";
-// import CustomerBranchModal from "../components/asset-dashboard/CustomerBranchModal";
+// import * as AssetAPI from "../../api/assetApi";
+// import AddAssetModal from "../../components/asset-dashboard/AddAssetModal";
+// import ConfirmationModal from "../../components/asset-dashboard/ConfirmationModal";
+// import CustomerBranchModal from "../../components/asset-dashboard/CustomerBranchModal";
 // // --- NEW: Import the Edit Modal ---
-// import EditAssetModal from "../components/asset-dashboard/EditAssetModal";
+// import EditAssetModal from "../../components/asset-dashboard/EditAssetModal";
 
 // // Helper function to normalize asset data
 // function normalizeAsset(asset) {
@@ -25,7 +25,6 @@
 //     serial: asset.serial_number,
 //     status: asset.status,
 //     customerId: asset.assigned_to_customer_id,
-//     warehouseId: asset.stored_at_warehouse_id,
 //     originalData: asset,
 //   };
 // }
@@ -39,7 +38,6 @@
 //     serial: `Pincode: ${fdh.pincode}`,
 //     status: "Active", // FDHs are generally 'Active'
 //     customerId: null,
-//     warehouseId: null,
 //     originalData: fdh,
 //   };
 // }
@@ -53,14 +51,12 @@
 //     serial: splitter.fdh_id ? `In FDH: ${splitter.fdh_id}` : "Unassigned",
 //     status: splitter.status,
 //     customerId: null,
-//     warehouseId: null, // Splitters might be in a warehouse if not in an FDH
 //     originalData: splitter,
 //   };
 // }
 
 // // FilterBox component
 // function FilterBox({
-//   warehouseList,
 //   filterInputs,
 //   onInputChange,
 //   onApplyFilters,
@@ -68,29 +64,7 @@
 // }) {
 //   return (
 //     <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4">
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//         <div>
-//           <label
-//             htmlFor="warehouseId"
-//             className="block text-sm font-medium text-gray-700 mb-1"
-//           >
-//             Warehouse
-//           </label>
-//           <select
-//             id="warehouseId"
-//             name="warehouseId"
-//             value={filterInputs.warehouseId}
-//             onChange={onInputChange}
-//             className="w-full text-sm text-gray-700 bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//           >
-//             <option value="">All Warehouses</option>
-//             {warehouseList.map((w) => (
-//               <option key={w.id} value={w.id}>
-//                 {w.address} (ID: {w.id})
-//               </option>
-//             ))}
-//           </select>
-//         </div>
+//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 //         <div>
 //           <label
 //             htmlFor="pincode"
@@ -152,16 +126,13 @@
 //   const [displayAssets, setDisplayAssets] = useState([]);
 //   const [originalData, setOriginalData] = useState(null);
 //   const [loading, setLoading] = useState(true);
-//   const [warehouseList, setWarehouseList] = useState([]);
 //   const [availableSplitters, setAvailableSplitters] = useState([]);
 
 //   const [selectedAssetId, setSelectedAssetId] = useState(null);
 //   const [filterInputs, setFilterInputs] = useState({
-//     warehouseId: "",
 //     pincode: "",
 //   });
 //   const [filters, setFilters] = useState({
-//     warehouseId: "",
 //     pincode: "",
 //   });
 //   const [collapseState, setCollapseState] = useState({
@@ -186,11 +157,6 @@
 //   // Filter logic
 //   useEffect(() => {
 //     let assets = [...allAssets];
-//     if (filters.warehouseId) {
-//       assets = assets.filter(
-//         (a) => a.warehouseId?.toString() === filters.warehouseId
-//       );
-//     }
 //     if (filters.pincode) {
 //       assets = assets.filter((a) =>
 //         a.originalData.pincode?.startsWith(filters.pincode)
@@ -215,20 +181,6 @@
 //       const combinedAssets = [...ontsAndRouters, ...fdhs, ...splitters];
 //       setAllAssets(combinedAssets);
 //       setDisplayAssets(combinedAssets);
-
-//       // Extract unique warehouses for filters
-//       const warehouses = data.assets
-//         .map((a) => a.warehouse)
-//         .filter((w) => w !== null);
-//       const uniqueWarehouses = Array.from(
-//         new Map(warehouses.map((w) => [w.warehouse_id, w])).values()
-//       );
-//       setWarehouseList(
-//         uniqueWarehouses.map((w) => ({
-//           id: w.warehouse_id,
-//           address: w.address,
-//         }))
-//       );
 
 //       // Extract splitters that are not in an FDH
 //       const unassignedSplitters = data.splitters.filter(
@@ -260,7 +212,7 @@
 //     setFilters(filterInputs);
 //   };
 //   const handleClearFilters = () => {
-//     const clearedFilters = { warehouseId: "", pincode: "" };
+//     const clearedFilters = { pincode: "" };
 //     setFilterInputs(clearedFilters);
 //     setFilters(clearedFilters);
 //   };
@@ -351,7 +303,6 @@
 
 //             {/* Filter Box */}
 //             <FilterBox
-//               warehouseList={warehouseList}
 //               filterInputs={filterInputs}
 //               onInputChange={handleInputChange}
 //               onApplyFilters={handleApplyFilters}
@@ -489,7 +440,6 @@
 //       <AddAssetModal
 //         isOpen={isAddModalOpen}
 //         onClose={() => setIsAddModalOpen(false)}
-//         warehouseList={warehouseList}
 //         availableSplitters={availableSplitters}
 //       />
 
@@ -504,7 +454,6 @@
 //         onClose={handleCloseEditModal}
 //         onSave={handleSaveEdit}
 //         asset={assetToEdit}
-//         warehouseList={warehouseList}
 //         availableSplitters={availableSplitters}
 //       />
 
@@ -539,15 +488,25 @@ import {
   X,
   Plus,
   GitBranch,
+  Spline, // <-- IMPORT NEW ICON
 } from "lucide-react";
 import * as AssetAPI from "../../api/assetApi";
 import AddAssetModal from "../../components/asset-dashboard/AddAssetModal";
 import ConfirmationModal from "../../components/asset-dashboard/ConfirmationModal";
-import CustomerBranchModal from "../../components/asset-dashboard/CustomerBranchModal";
+
+// --- 1. REMOVE OLD MODAL IMPORT ---
+// import CustomerBranchModal from "../../components/asset-dashboard/CustomerBranchModal";
+
+// --- 2. ADD NEW MODAL IMPORT ---
+// (Assuming it's in the same folder as this dashboard)
+import AssetTreeModal from "../../components/asset-dashboard/AssetTreeModal";
+
 // --- NEW: Import the Edit Modal ---
 import EditAssetModal from "../../components/asset-dashboard/EditAssetModal";
 
-// Helper function to normalize asset data
+// ... (Helper functions: normalizeAsset, normalizeFdh, normalizeSplitter are unchanged) ...
+// ... (FilterBox component is unchanged) ...
+// ... (SectionHeader component is unchanged) ...
 function normalizeAsset(asset) {
   return {
     id: asset.asset_id,
@@ -559,8 +518,6 @@ function normalizeAsset(asset) {
     originalData: asset,
   };
 }
-
-// Helper function to normalize FDH data
 function normalizeFdh(fdh) {
   return {
     id: fdh.fdh_id,
@@ -572,8 +529,6 @@ function normalizeFdh(fdh) {
     originalData: fdh,
   };
 }
-
-// Helper function to normalize Splitter data
 function normalizeSplitter(splitter) {
   return {
     id: splitter.splitter_id,
@@ -585,8 +540,6 @@ function normalizeSplitter(splitter) {
     originalData: splitter,
   };
 }
-
-// FilterBox component
 function FilterBox({
   filterInputs,
   onInputChange,
@@ -633,8 +586,6 @@ function FilterBox({
     </div>
   );
 }
-
-// SectionHeader component
 function SectionHeader({ title, count, isOpen, onToggle }) {
   return (
     <button
@@ -675,8 +626,15 @@ export default function AssetDashboard() {
 
   // --- State for Modals ---
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isCustomerBranchModalOpen, setIsCustomerBranchModalOpen] =
-    useState(false);
+
+  // --- 3. REMOVE OLD MODAL STATE ---
+  // const [isCustomerBranchModalOpen, setIsCustomerBranchModalOpen] =
+  //   useState(false);
+
+  // --- 4. ADD NEW MODAL STATE ---
+  const [isTreeModalOpen, setIsTreeModalOpen] = useState(false);
+  const [treeModalType, setTreeModalType] = useState("customer"); // 'customer' or 'fdh'
+
   // --- State for Edit/Delete ---
   const [assetToEdit, setAssetToEdit] = useState(null);
   const [assetToDelete, setAssetToDelete] = useState(null);
@@ -727,6 +685,21 @@ export default function AssetDashboard() {
 
   // --- Handlers ---
 
+  // --- 5. NEW HANDLERS FOR TREE MODAL ---
+  const handleOpenCustomerTree = () => {
+    setTreeModalType("customer");
+    setIsTreeModalOpen(true);
+  };
+
+  const handleOpenFdhTree = () => {
+    setTreeModalType("fdh");
+    setIsTreeModalOpen(true);
+  };
+
+  const handleCloseTreeModal = () => {
+    setIsTreeModalOpen(false);
+  };
+
   const handleSelectAsset = (assetId) => {
     if (selectedAssetId === assetId) {
       setSelectedAssetId(null);
@@ -753,36 +726,25 @@ export default function AssetDashboard() {
   };
 
   // --- Handlers for Edit/Delete ---
+  // ... (these handlers are unchanged) ...
   const handleEditRequest = (asset) => {
     setAssetToEdit(asset);
   };
-
   const handleCloseEditModal = () => {
     setAssetToEdit(null);
   };
-
   const handleSaveEdit = async (formData) => {
     if (!assetToEdit) return;
-
-    // TODO: You will need to implement this API call
-    // await AssetAPI.updateAsset(assetToEdit.type, assetToEdit.id, formData);
     console.log("Saving update:", assetToEdit.type, assetToEdit.id, formData);
-
     setAssetToEdit(null);
     await loadData(); // Refresh all data
   };
-
   const handleDeleteRequest = (asset) => {
     setAssetToDelete(asset);
   };
-
   const handleConfirmDelete = async () => {
     if (!assetToDelete) return;
-
-    // TODO: You will need to implement this API call
-    // await AssetAPI.deleteAsset(assetToDelete.type, assetToDelete.id);
     console.log("Deleting:", assetToDelete.type, assetToDelete.id);
-
     setAssetToDelete(null);
     await loadData(); // Refresh all data
   };
@@ -822,13 +784,25 @@ export default function AssetDashboard() {
                   <Plus size={18} />
                   Add Asset
                 </button>
-                <button
-                  onClick={() => setIsCustomerBranchModalOpen(true)}
-                  className="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3 py-2 rounded-lg transition-colors shadow-sm text-sm font-semibold"
-                >
-                  <GitBranch size={16} />
-                  View Customer Branch
-                </button>
+
+                {/* --- 6. REPLACE OLD BUTTON WITH NEW BUTTONS --- */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleOpenCustomerTree}
+                    className="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3 py-2 rounded-lg transition-colors shadow-sm text-sm font-semibold"
+                  >
+                    <GitBranch size={16} />
+                    View Customer Tree
+                  </button>
+                  <button
+                    onClick={handleOpenFdhTree}
+                    className="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3 py-2 rounded-lg transition-colors shadow-sm text-sm font-semibold"
+                  >
+                    <Spline size={16} />
+                    View FDH Tree
+                  </button>
+                </div>
+                {/* --- END OF REPLACEMENT --- */}
               </div>
             </div>
 
@@ -974,11 +948,14 @@ export default function AssetDashboard() {
         availableSplitters={availableSplitters}
       />
 
-      <CustomerBranchModal
-        isOpen={isCustomerBranchModalOpen}
-        onClose={() => setIsCustomerBranchModalOpen(false)}
-        allData={originalData}
-      />
+      {/* --- 7. REPLACE OLD MODAL WITH NEW --- */}
+      {isTreeModalOpen && (
+        <AssetTreeModal
+          type={treeModalType}
+          id={null} // Pass null to make it ask for an ID
+          onClose={handleCloseTreeModal}
+        />
+      )}
 
       <EditAssetModal
         isOpen={!!assetToEdit}

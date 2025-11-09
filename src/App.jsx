@@ -60,6 +60,7 @@ import CustomerOnboarding from "./views/pages/CustomerOnboarding";
 import TasksPage from "./views/pages/TasksDashboard";
 import SupportPage from "./views/pages/SupportDashboard";
 import AuditPage from "./views/pages/AuditDashboard";
+import UserManagementDashboard from "./views/pages/UserManagementDashboard";
 
 /**
  * The main App component.
@@ -131,6 +132,14 @@ export default function App() {
           element={
             <RoleProtected allowedRoles={["Admin"]}>
               <AuditPage />
+            </RoleProtected>
+          }
+        />
+        <Route
+          path="users"
+          element={
+            <RoleProtected allowedRoles={["Admin"]}>
+              <UserManagementDashboard />
             </RoleProtected>
           }
         />
