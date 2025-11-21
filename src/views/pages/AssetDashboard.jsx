@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // import { useState, useEffect } from "react";
 // import StatsSummary from "../../components/asset-dashboard/StatsSummary";
 // import AssetRow from "../../components/asset-dashboard/AssetRow";
@@ -493,16 +494,9 @@ import {
 import * as AssetAPI from "../../api/assetApi";
 import AddAssetModal from "../../components/asset-dashboard/AddAssetModal";
 import ConfirmationModal from "../../components/asset-dashboard/ConfirmationModal";
-
-// --- 1. REMOVE OLD MODAL IMPORT ---
-// import CustomerBranchModal from "../../components/asset-dashboard/CustomerBranchModal";
-
-// --- 2. ADD NEW MODAL IMPORT ---
-// (Assuming it's in the same folder as this dashboard)
 import AssetTreeModal from "../../components/asset-dashboard/AssetTreeModal";
-
-// --- NEW: Import the Edit Modal ---
 import EditAssetModal from "../../components/asset-dashboard/EditAssetModal";
+import SwapAssetModal from "../../components/asset-dashboard/SwapAssetModal";
 
 // ... (Helper functions: normalizeAsset, normalizeFdh, normalizeSplitter are unchanged) ...
 // ... (FilterBox component is unchanged) ...
@@ -606,6 +600,7 @@ function SectionHeader({ title, count, isOpen, onToggle }) {
 export default function AssetDashboard() {
   const [allAssets, setAllAssets] = useState([]);
   const [displayAssets, setDisplayAssets] = useState([]);
+  const [assetToSwap, setAssetToSwap] = useState(null);
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [availableSplitters, setAvailableSplitters] = useState([]);
@@ -685,6 +680,19 @@ export default function AssetDashboard() {
 
   // --- Handlers ---
 
+  const handleAddSuccess = () => {
+    setIsAddModalOpen(false); // Close the modal
+    loadData(); // Refresh the list to show the new asset
+  };
+
+  const handleSwapRequest = (asset) => {
+    setAssetToSwap(asset);
+  };
+  const handleSwapSuccess = () => {
+    setAssetToSwap(null);
+    loadData(); // Refresh list
+  };
+
   // --- 5. NEW HANDLERS FOR TREE MODAL ---
   const handleOpenCustomerTree = () => {
     setTreeModalType("customer");
@@ -735,18 +743,53 @@ export default function AssetDashboard() {
   };
   const handleSaveEdit = async (formData) => {
     if (!assetToEdit) return;
-    console.log("Saving update:", assetToEdit.type, assetToEdit.id, formData);
-    setAssetToEdit(null);
-    await loadData(); // Refresh all data
+
+    // Restriction: Our current backend /assets endpoint creates ONTs/Routers.
+    // FDHs/Splitters are different tables, so we block them here for safety.
+    if (assetToEdit.type === "FDH" || assetToEdit.type === "Splitter") {
+      alert("Editing FDH or Splitter details is not yet supported.");
+      return;
+    }
+
+    try {
+      // Call the API
+      await AssetAPI.updateAsset(assetToEdit.id, formData);
+
+      // Success! Close modal and refresh list
+      setAssetToEdit(null);
+      loadData();
+    } catch (error) {
+      console.error("Update failed:", error);
+      const errorMsg =
+        error.response?.data?.detail || "Failed to update asset.";
+      alert(errorMsg); // Simple alert for error, or set a state error if you prefer
+    }
   };
   const handleDeleteRequest = (asset) => {
     setAssetToDelete(asset);
   };
   const handleConfirmDelete = async () => {
     if (!assetToDelete) return;
-    console.log("Deleting:", assetToDelete.type, assetToDelete.id);
-    setAssetToDelete(null);
-    await loadData(); // Refresh all data
+
+    // Restriction: Block FDH/Splitter deletion for now
+    if (assetToDelete.type === "FDH" || assetToDelete.type === "Splitter") {
+      alert("Deleting FDH or Splitter is not yet supported.");
+      return;
+    }
+
+    try {
+      // Call the API
+      await AssetAPI.deleteAsset(assetToDelete.id);
+
+      // Success! Close modal and refresh list
+      setAssetToDelete(null);
+      loadData();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      const errorMsg =
+        error.response?.data?.detail || "Failed to delete asset.";
+      alert(errorMsg);
+    }
   };
 
   // Memoized asset groups
@@ -834,6 +877,7 @@ export default function AssetDashboard() {
                         onSelect={handleSelectAsset}
                         onEdit={handleEditRequest}
                         onDelete={handleDeleteRequest}
+                        onSwap={handleSwapRequest}
                       />
                     ))}
                     {onts.length === 0 && !loading && (
@@ -863,6 +907,7 @@ export default function AssetDashboard() {
                         onSelect={handleSelectAsset}
                         onEdit={handleEditRequest}
                         onDelete={handleDeleteRequest}
+                        onSwap={handleSwapRequest}
                       />
                     ))}
                     {routers.length === 0 && !loading && (
@@ -892,6 +937,7 @@ export default function AssetDashboard() {
                         onSelect={handleSelectAsset}
                         onEdit={handleEditRequest}
                         onDelete={handleDeleteRequest}
+                        onSwap={handleSwapRequest}
                       />
                     ))}
                     {fdhs.length === 0 && !loading && (
@@ -921,6 +967,7 @@ export default function AssetDashboard() {
                         onSelect={handleSelectAsset}
                         onEdit={handleEditRequest}
                         onDelete={handleDeleteRequest}
+                        onSwap={handleSwapRequest}
                       />
                     ))}
                     {splitters.length === 0 && !loading && (
@@ -946,6 +993,7 @@ export default function AssetDashboard() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         availableSplitters={availableSplitters}
+        onSuccess={handleAddSuccess}
       />
 
       {/* --- 7. REPLACE OLD MODAL WITH NEW --- */}
@@ -956,6 +1004,13 @@ export default function AssetDashboard() {
           onClose={handleCloseTreeModal}
         />
       )}
+
+      <SwapAssetModal
+        isOpen={!!assetToSwap}
+        onClose={() => setAssetToSwap(null)}
+        onSuccess={handleSwapSuccess}
+        currentAsset={assetToSwap}
+      />
 
       <EditAssetModal
         isOpen={!!assetToEdit}

@@ -1,5 +1,4 @@
 import { useFrame, Canvas } from "@react-three/fiber";
-// Import the LogOut icon
 import { LogIn, Info, LogOut } from "lucide-react";
 import { useRef } from "react";
 
